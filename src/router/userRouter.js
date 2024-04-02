@@ -4,6 +4,7 @@ const controller=require('../controller/index')
 const { validateUser,validateLogin, handleValidationErrors } =require('../helper/vallidation')
 const {authenticateToken} =require('../helper/middleware')
 
+let uploads=require('../helper/fileUpload').upload
 
 
 app.post('/getOtp',controller.userController.getOtp)
@@ -17,7 +18,9 @@ app.post('/forgetPasswordFn',controller.userController.forgetPasswordFn)
 
 app.get('/getUserProfile',authenticateToken,controller.userController.getUserProfileFn)
 
-
+app.post('/deposit',authenticateToken,uploads,controller.userController.deposit)
+app.post('/generteWithdrawalPassword',authenticateToken,controller.userController.withdrawlCreatePassword)
+app.post('/withdrawl',authenticateToken,controller.userController.withdrawl)
 
 
 

@@ -24,5 +24,7 @@ connectDB();
 module.exports = {
   Admin: require('../model/admin.schema'), // Export the Admin model from admin.schema file
   SubAdmin: require('../model/subAdmin.schema'), // Export the User model from user.schema file
-  User: require('../model/user.schema')
+  User: require('../model/user.schema'),
+  Deposite:require('../model/deposit.schema'),
+  Withdrawl:require('../model/withdrawl.schema')
 };

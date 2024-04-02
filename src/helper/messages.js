@@ -18,7 +18,9 @@ const messages = {
     inValidPassword: "Invalid password",
     phoneRegisterSuccess:"phone register",
     phoneRegisterError:"phone already register",
-    phoneNotRegister:"phone not register"
+    phoneNotRegister:"phone not register",
+    amountDepositSuccess:"amount deposit success",
+    amountNotDeposit:"amount not deposit"
 
     // Add more messages as needed
 };

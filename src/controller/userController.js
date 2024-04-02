@@ -1,7 +1,7 @@
 // Import necessary modules and dependencies
 const db = require('../config/db'); // Import the database connection module (update the path accordingly)
 const User = db.User; // Reference to the User model from the database
-const { hashPassword, comparePassword, generateRandomNumber, sendSMS } = require('../helper/middleware'); // Import middleware functions for password hashing, comparison, and random number generation
+const { hashPassword, comparePassword, generateRandomNumber, sendSMS, upload } = require('../helper/middleware'); // Import middleware functions for password hashing, comparison, and random number generation
 const jwt = require('jsonwebtoken'); // Import JSON Web Token module for token generation
 const secretKey = process.env.JWT_SECRET_KEY; // Secret key for JWT token signing
 const CryptoJS = require('crypto-js'); // Import CryptoJS for encryption and decryption (not used in provided code)
@@ -9,6 +9,9 @@ const sendMail = require('../helper/email'); // Import module for sending emails
 const Msg = require('../helper/messages'); // Import module for storing messages/constants
 
 const bcrypt = require('bcryptjs'); // Import bcrypt for password hashing and comparison
+
+const deposit = db.Deposite;
+const Withdrawl = db.Withdrawl
 
 // Function to register a new user
 exports.getOtp = async (req, res) => {
@@ -478,7 +481,97 @@ exports.getUserProfileFn = async (req, res) => {
     }
 }
 
+exports.deposit = async (req, res) => {
+    try {
+        let userId = req.decoded.userId; // Get the user ID from the decoded JWT token
+        let { utrNumber, amount } = req.body
+        let image = req.file
+        let obj = {
+            utrNumber: utrNumber,
+            amount: amount,
+            file: image.path,
+            userId: userId
+        };
+        let data = await deposit.insertMany(obj)
+        if (data) {
+            return res.status(200).send({
+                status: true,
+                msg: Msg.amountDepositSuccess,
+                data: data
+            });
+        } else {
+            return res.status(200).send({
+                status: false,
+                msg: Msg.amountNotDeposit
+            });
+        }
+    } catch (error) {
+        return res.status(400).send({
+            status: false,
+            msg: "Something went wrong"
+        });
+    }
+}
 
+exports.withdrawlCreatePassword = async (req, res) => {
+    try {
+        let userId = req.decoded.userId; // Get the user ID from the decoded JWT token
+        let { password } = req.body
+        let newPassword = await hashPassword(password);
+        let obj = {
+            password: newPassword,
+            userId: userId
+        };
+        let data = await Withdrawl.insertMany(obj)
+        if (data) {
+            return res.status(200).send({
+                status: true,
+                msg: 'password generated succesfully',
+            });
+        } else {
+            return res.status(200).send({
+                status: false,
+                msg: 'password not generated'
+            });
+        }
+    } catch (error) {
+        return res.status(400).send({
+            status: false,
+            msg: "Something went wrong"
+        });
+    }
+}
 
-
+exports.withdrawl = async (req, res) => {
+    try {
+        let userId = req.decoded.userId; // Get the user ID from the decoded JWT token
+        let { password } = req.body
+        let isExists = await Withdrawl.findOne({ userId: userId });
+        if (isExists) {
+            let pass = isExists.password;
+            let checkPassword = await bcrypt.compare(password,pass);
+            if (checkPassword) {
+                return res.status(200).send({
+                    status: true,
+                    msg: 'login succesfully',
+                });
+            } else {
+                return res.status(200).send({
+                    status: false,
+                    msg: 'wrong password', // Send error message if password is invalid
+                });
+            }
+        } else {
+            return res.status(200).send({
+                status: false,
+                msg: 'Firstly Create Your Password', // Send error message if phone is not registered
+            });
+        }
+    } catch (error) {
+        return res.status(400).send({
+            status: false,
+            msg: "Something went wrong"
+        });
+    }
+}
 
